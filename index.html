@@ -1,68 +1,71 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<title>Les Ships d'ANO</title>
-<style>
+<head>
+    <meta charset="utf-8">
+    <title>Les Ships d'ANO</title>
+    <style>
 
-svg {
-    margin: 0 auto;
-    display: block;
-}
+        svg {
+            margin: 0 auto;
+            display: block;
+        }
 
-.node {
-  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  fill: #464646;
-  text-transform: capitalize;
-}
+        .node {
+          font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+          fill: #464646;
+          text-transform: capitalize;
+        }
 
-.node:hover {
-  fill: #000;
-}
+        .node:hover {
+            fill: #000;
+            cursor: pointer;
+        }
 
-.link {
-  stroke: steelblue;
-  stroke-opacity: 0.5;
-  fill: none;
-  pointer-events: none;
-}
+        .link {
+          stroke: steelblue;
+          stroke-opacity: 0.5;
+          fill: none;
+          pointer-events: none;
+        }
 
-.node:hover,
-.node--source,
-.node--target {
-  font-weight: 700;
-}
+        .node:hover,
+        .node--source,
+        .node--target {
+          font-weight: 700;
+        }
 
-/*
-.node--source {
-  fill: #2ca02c;
-}
+        /*
+        .node--source {
+          fill: #2ca02c;
+        }
 
-.node--target {
-  fill: #d62728;
-}
-*/
+        .node--target {
+          fill: #d62728;
+        }
+        */
 
-.link--source,
-.link--target {
-  stroke-opacity: 1;
-  stroke-width: 2px;
-}
+        .link--source,
+        .link--target {
+          stroke-opacity: 1;
+          stroke-width: 2px;
+        }
 
-.link--source {
-  stroke: #d62728;
-}
+        .link--source {
+          stroke: #d62728;
+        }
 
-.link--target {
-  stroke: #2ca02c;
-}
+        .link--target {
+          stroke: #2ca02c;
+        }
 
-</style>
-<link rel="stylesheet" href="ships.css"/>
+    </style>
+    <link rel="stylesheet" href="ships.css"/>
+</head>
 <body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
-var superlinks = [];
-var superkeys = [];
+var superLinks = [];
+var superKeys = [];
 
 var diameter = 960,
     radius = diameter / 2,
@@ -100,28 +103,25 @@ d3.json("ships.json", function(error, classes) {
       .each(function(d) { d.source = d[0], d.target = d[d.length - 1]; })
     //  .attr("class", "link")
       .attr("class", function(d) {
-      	baseclass_ = "link";
+      	baseClass_ = "link";
       	
       	const findLink = (element) => 
       		element.startsWith(d.source.data.key) && element.endsWith(d.target.data.key);
       		
-      	index_ = superlinks.findIndex(findLink);
+      	index_ = superLinks.findIndex(findLink);
       	if(index_ > -1) {
-      	  var del = superlinks.splice(index_, 1)[0];
+      	  var del = superLinks.splice(index_, 1)[0];
       	  var cleanLink = del.replace(d.source.data.key, "").replace(d.target.data.key, "");
       	  
-      	  baseclass_ = baseclass_ + " link--" + cleanLink;
+      	  baseClass_ = baseClass_ + " link--" + cleanLink;
       	}
       	
-      	return baseclass_;
+      	return baseClass_;
       })
       .each(function(d,i){
         d3.select(this)
         .attr("d", lineConstructor());
       })
-      
-      console.log(superlinks);
-      console.log(superkeys);
 
   node = node
     .data(root.leaves())
@@ -189,8 +189,6 @@ function packageHierarchy(classes) {
 function packageLinks(nodes) {
   var map = {},
       links = [];
-      
-  var testlinks = [];
 
   // Compute a map from name to node.
   nodes.forEach(function(d) {
@@ -207,10 +205,9 @@ function packageLinks(nodes) {
     keys.forEach(function(k) {
       d.data[k].forEach(function(i) {
         links.push(map[d.data.name].path(map[i]));
-        superlinks.push(d.data.name + "" + k + "" + i);
-        // console.log(map[d.data.name].path(map[i]));
+        superLinks.push(d.data.name + "" + k + "" + i);
       });
-      superkeys.indexOf(k) === -1 ? superkeys.push(k) : null ;
+      superKeys.indexOf(k) === -1 ? superkeys.push(k) : null ;
     });
   });
   
