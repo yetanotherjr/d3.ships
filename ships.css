@@ -1,0 +1,27 @@
+.link--fab {
+  stroke: deeppink!important;
+}
+
+.link--otp {
+  stroke: red!important;
+}
+
+.link--bro {
+  stroke: orange!important;
+}
+
+.link--ship {
+  stroke: pink!important;
+}
+
+.link--maybe {
+  stroke: deepskyblue!important;
+}
+
+.link--danger {
+  stroke: chartreuse!important;
+}
+
+.link--nope {
+  stroke: black!important;
+}

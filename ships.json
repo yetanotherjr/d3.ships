@@ -1,0 +1,88 @@
+[{
+  "name": "eden",
+  "fab" : ["roger"],
+  "otp": [],
+  "bro": ["mia", "pearl", "noïd"],
+  "ship": ["sam", "blanche", "amé", "laura"],
+  "maybe": [],
+  "danger": [],
+  "nope": []
+}
+, {
+  "name": "roger"
+}, {
+  "name": "mia",
+  "otp": ["nova"]
+}, {
+  "name": "nova",
+  "bro": ["steph"]
+}, {
+  "name": "liz",
+  "otp": ["jared"],
+  "danger": ["amé"],
+  "nope": ["dim"]
+}, {
+  "name": "jared",
+  "ship": ["nathan"],
+  "bro": ["nathan"]
+}, {
+  "name": "grenat",
+  "otp": ["steph"],
+  "bro": ["laura", "noïd"],
+  "nope": ["dieter"]
+}, {
+  "name": "steph",
+  "bro": ["noïd"]
+}, {
+  "name": "kat",
+  "otp": ["victor"],
+  "bro": ["elisa"]
+}, {
+  "name": "victor"
+}, {
+  "name": "noïd",
+  "otp": ["pearl"],
+  "maybe": ["nathan"]
+}, {
+  "name": "pearl"
+}, {
+  "name": "mandy",
+  "otp": ["nathan"]
+}, {
+  "name": "nathan"
+}, {
+  "name": "jenny",
+  "otp": ["sam"],
+  "maybe": ["elisa"]
+}, {
+  "name": "sam"
+}, {
+  "name": "dim",
+  "bro": ["dieter"],
+  "ship": ["ade"],
+  "danger": ["elisa", "ade"]
+}, {
+  "name": "dieter",
+  "bro": ["andrew"],
+  "ship": ["éléanore", "andrew"]
+}, {
+  "name": "erika",
+  "bro": ["ade"]
+}, {
+  "name": "ade"
+}, {
+  "name": "laura"
+}, {
+  "name": "elisa"
+}, {
+  "name": "andrew"
+}, {
+  "name": "blanche",
+  "maybe": ["éléanore"]
+}, {
+  "name": "amé"
+}, {
+  "name": "éléanore"
+}, {
+  "name": "marie-lou"
+}]

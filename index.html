@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Les Ships d'ANO</title>
+<style>
+
+svg {
+    margin: 0 auto;
+    display: block;
+}
+
+.node {
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #464646;
+  text-transform: capitalize;
+}
+
+.node:hover {
+  fill: #000;
+}
+
+.link {
+  stroke: steelblue;
+  stroke-opacity: 0.5;
+  fill: none;
+  pointer-events: none;
+}
+
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 700;
+}
+
+/*
+.node--source {
+  fill: #2ca02c;
+}
+
+.node--target {
+  fill: #d62728;
+}
+*/
+
+.link--source,
+.link--target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.link--source {
+  stroke: #d62728;
+}
+
+.link--target {
+  stroke: #2ca02c;
+}
+
+</style>
+<link rel="stylesheet" href="ships.css"/>
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var superlinks = [];
+var superkeys = [];
+
+var diameter = 960,
+    radius = diameter / 2,
+    innerRadius = radius - 120;
+
+var cluster = d3.cluster()
+    .size([360, innerRadius]);
+
+var line = d3.radialLine()
+    .curve(d3.curveBundle.beta(0.85))
+    .radius(function(d) { return d.y; })
+    .angle(function(d) { return d.x / 180 * Math.PI; });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", diameter)
+    .attr("height", diameter)
+  .append("g")
+    .attr("transform", "translate(" + radius + "," + radius + ")");
+
+var link = svg.append("g").selectAll(".link"),
+    node = svg.append("g").selectAll(".node");
+
+
+d3.json("ships.json", function(error, classes) {
+  if (error) throw error;
+
+  var root = packageHierarchy(classes)
+      .sum(function(d) { return d.size; });
+
+  cluster(root);
+
+  link = link
+    .data(packageLinks(root.leaves()))
+    .enter().append("path")
+      .each(function(d) { d.source = d[0], d.target = d[d.length - 1]; })
+    //  .attr("class", "link")
+      .attr("class", function(d) {
+      	baseclass_ = "link";
+      	
+      	const findLink = (element) => 
+      		element.startsWith(d.source.data.key) && element.endsWith(d.target.data.key);
+      		
+      	index_ = superlinks.findIndex(findLink);
+      	if(index_ > -1) {
+      	  var del = superlinks.splice(index_, 1)[0];
+      	  var cleanLink = del.replace(d.source.data.key, "").replace(d.target.data.key, "");
+      	  
+      	  baseclass_ = baseclass_ + " link--" + cleanLink;
+      	}
+      	
+      	return baseclass_;
+      })
+      .each(function(d,i){
+        d3.select(this)
+        .attr("d", lineConstructor());
+      })
+      
+      console.log(superlinks);
+      console.log(superkeys);
+
+  node = node
+    .data(root.leaves())
+    .enter().append("text")
+      .attr("class", "node")
+      .attr("dy", "0.31em")
+      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
+      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+      .text(function(d) { return d.data.key; })
+      .on("mouseover", mouseovered)
+      .on("mouseout", mouseouted);
+});
+
+function mouseovered(d) {
+  node
+      .each(function(n) { n.target = n.source = false; });
+
+  link
+      .classed("link--target", function(l) { if (l.target === d) return l.source.source = true; })
+      .classed("link--source", function(l) { if (l.source === d) return l.target.target = true; })
+    .filter(function(l) { return l.target === d || l.source === d; })
+      .raise();
+
+  node
+      .classed("node--target", function(n) { return n.target; })
+      .classed("node--source", function(n) { return n.source; });
+}
+
+function mouseouted(d) {
+  link
+      .classed("link--target", false)
+      .classed("link--source", false);
+
+  node
+      .classed("node--target", false)
+      .classed("node--source", false);
+}
+
+// Lazily construct the package hierarchy from class names.
+function packageHierarchy(classes) {
+  var map = {};
+
+  function find(name, data) {
+    var node = map[name], i;
+    if (!node) {
+      node = map[name] = data || {name: name, children: []};
+      if (name.length) {
+        node.parent = find(name.substring(0, i = name.lastIndexOf(".")));
+        node.parent.children.push(node);
+        node.key = name.substring(i + 1);
+      }
+    }
+    return node;
+  }
+
+  classes.forEach(function(d) {
+    find(d.name, d);
+  });
+
+  return d3.hierarchy(map[""]);
+}
+
+// Return a list of links for the given array of nodes.
+// Use "rels" to store relations
+function packageLinks(nodes) {
+  var map = {},
+      links = [];
+      
+  var testlinks = [];
+
+  // Compute a map from name to node.
+  nodes.forEach(function(d) {
+    map[d.data.name] = d;
+  });
+
+  // For each ship, construct a link from the source to target node.
+  nodes.forEach(function(d) {
+
+  // Auto generate keys list by substracting name & uneccessary ones
+    const keys = Object.keys(d.data)
+      .filter(x => ["parent", "name", "key"].indexOf(x) === -1);
+  
+    keys.forEach(function(k) {
+      d.data[k].forEach(function(i) {
+        links.push(map[d.data.name].path(map[i]));
+        superlinks.push(d.data.name + "" + k + "" + i);
+        // console.log(map[d.data.name].path(map[i]));
+      });
+      superkeys.indexOf(k) === -1 ? superkeys.push(k) : null ;
+    });
+  });
+  
+  return links;
+}
+
+// To cover multiple links between nodes
+
+function lineConstructor () {
+  let manipulator = 0.7+(Math.random()*0.3);
+  // console.log(manipulator);
+  return d3.radialLine()
+          .curve(d3.curveBundle.beta(manipulator))
+          .radius(function(d) { return d.y; })
+          .angle(function(d) { return d.x / 180 * Math.PI; });
+
+} 
+
+</script>
